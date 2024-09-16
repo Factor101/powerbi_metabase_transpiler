@@ -3,13 +3,13 @@ import '../typedefs.js';
 
 /**
  * Encodes SQL queries to Metabase
- * @class MetabaseEncoder
+ * @class MetabaseTranspiler
  * @classdesc Encodes SQL queries to Metabase
  * @param {ConfigBuilder} cfg 
  * @property {ConfigBuilder} cfg - Configuration settings
  * @property {string} query - SQL query to be encoded
  */
-export const MetabaseEncoder = function(cfg)
+export const MetabaseTranspiler = function(cfg)
 {
     this.cfg = cfg;
     this.query;
@@ -18,8 +18,7 @@ export const MetabaseEncoder = function(cfg)
             // g1 = query body
             QUERY_STRING: /(?:\.Database\((?:(?:\"|\')[^\"\']*){4}\s*\")(.*)(?=\"[^\[]+?)/is,
             // g1 = param name, ?g2 = param cast
-            PARAMS: /((?:@[\w]+?[\w\d]*)|(?:(?<='"&)\w+(?=&"')))((?:\:{2})[\w]+?[\w\d]*)?/gis,
-            OPTIONAL_CLAUSE: /\[\s*?\[(.*?)\]\s*?\]/g, // g1 = clause body
+            PARAMS: /((?:@\w+?[\w\d]*)|(?:(?<='"&)\w+(?=&"')))((?:\:{2})[\w]+?[\w\d]*)?/gis
         };
     }
 
@@ -34,7 +33,7 @@ export const MetabaseEncoder = function(cfg)
         Logger.info('Converting query to Metabase...');
         this.query = sql;
         // in the event an M query is copied in full, this regexp will pull the raw query 
-        this.query = this.query.match(MetabaseEncoder.REGEX.QUERY_STRING)?.[1] ?? this.query;
+        this.query = this.query.match(MetabaseTranspiler.REGEX.QUERY_STRING)?.[1] ?? this.query;
         
         if(this.cfg.values.REPLACE_POWERBI_PARAMS) {
             this.replaceParams();
@@ -51,7 +50,7 @@ export const MetabaseEncoder = function(cfg)
      */
     this.replaceParams = () =>
     {
-        this.query = this.query.replace(MetabaseEncoder.REGEX.PARAMS, (match, varName, typeCast) => {
+        this.query = this.query.replace(MetabaseTranspiler.REGEX.PARAMS, (match, varName, typeCast) => {
             return `{{${varName.replace('@', '')}}}${typeCast ? `${typeCast}` : ''}`;
         });
     }

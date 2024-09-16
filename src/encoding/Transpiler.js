@@ -1,6 +1,6 @@
 import { Logger } from "../io/Logger.js";
 import { PowerTranspiler } from "./PowerTranspiler.js";
-import { MetabaseEncoder } from "./MetabaseTranspiler.js";
+import { MetabaseTranspiler } from "./MetabaseTranspiler.js";
 import "../typedefs.js";
 
 /**
@@ -9,7 +9,7 @@ import "../typedefs.js";
  * @classdesc Transpiles Metabase/Metabase SQL queries to PowerBI and vice versa
  * @param {ConfigBuilder} cfg 
  * @property {LANGUAGE} LANGUAGE - Supported query languages
- * @property {Object.<string, PowerTranspiler | MetabaseEncoder>} encoders - Query encoders
+ * @property {Object.<string, PowerTranspiler | MetabaseTranspiler>} encoders - Query encoders
  */
 export const Transpiler = function(cfg)
 {
@@ -19,7 +19,7 @@ export const Transpiler = function(cfg)
     };
 
     this.encoders = {
-        [this.LANGUAGE.POWERBI]: new MetabaseEncoder(cfg),
+        [this.LANGUAGE.POWERBI]: new MetabaseTranspiler(cfg),
         [this.LANGUAGE.METABASE]: new PowerTranspiler(cfg)
     };
 
